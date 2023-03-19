@@ -65,11 +65,81 @@ const addBookHandler = (request, h) => {
   return response;
 };
 
-const getAllBooksHandler = () => {
-  const newBook = books.map(({ id, name, publisher }) => ({
-    id,
-    name,
-    publisher,
+const getAllBooksHandler = (request) => {
+  const { name, reading, finished } = request.query;
+
+  if (name !== undefined) {
+    const getBookByNameQuery = books.filter((b) => {
+      const bookName = JSON.stringify(b.name).toLowerCase();
+      const queryName = name.toLowerCase();
+
+      return bookName.includes(queryName);
+    });
+
+    const queryNameBook = getBookByNameQuery.map((book) => ({
+      id: book.id,
+      name: book.name,
+      publisher: book.publisher,
+    }));
+
+    return ({
+      status: 'success',
+      data: {
+        books: queryNameBook,
+      },
+    });
+  }
+
+  if (reading !== undefined) {
+    let getBookByReadingQuery = null;
+
+    if (+reading === 0 || +reading === 1) {
+      getBookByReadingQuery = books.filter((b) => b.reading === !!+reading);
+    } else {
+      getBookByReadingQuery = books;
+    }
+
+    const readingQueryBook = getBookByReadingQuery.map((book) => ({
+      id: book.id,
+      name: book.name,
+      publisher: book.publisher,
+    }));
+
+    return ({
+      status: 'success',
+      data: {
+        books: readingQueryBook,
+      },
+    });
+  }
+
+  if (finished !== undefined) {
+    let getBookByFinishedQuery = null;
+
+    if (+finished === 0 || +finished === 1) {
+      getBookByFinishedQuery = books.filter((b) => b.finished === !!+finished);
+    } else {
+      getBookByFinishedQuery = books;
+    }
+
+    const finishedQueryBook = getBookByFinishedQuery.map((book) => ({
+      id: book.id,
+      name: book.name,
+      publisher: book.publisher,
+    }));
+
+    return ({
+      status: 'success',
+      data: {
+        books: finishedQueryBook,
+      },
+    });
+  }
+
+  const newBook = books.map((book) => ({
+    id: book.id,
+    name: book.name,
+    publisher: book.publisher,
   }));
 
   return {
